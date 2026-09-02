@@ -1,4 +1,4 @@
-package model.Markets;
+package model.markets;
 
 public enum MarketType {
     MONEY, SPREAD, TOTAL, TEAM_TOTAL, MONEYLINE_3_WAY_WIN, MONEYLINE_3_WAY_DRAW,

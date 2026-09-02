@@ -1,4 +1,4 @@
-package model.Markets;
+package model.markets;
 
 public enum League {
     NFL, NBA, MLB,
