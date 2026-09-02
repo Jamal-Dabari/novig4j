@@ -41,7 +41,6 @@ public class NovigHttpClient implements AutoCloseable {
     }
 
     public String getClientId() {return clientId;}
-    public String getClientSecret() {return clientSecret;}
     public NovigEnvironment getEnvironment() {return environment;}
 
     public static final class Builder {
