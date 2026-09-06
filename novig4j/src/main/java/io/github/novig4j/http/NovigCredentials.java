@@ -1,23 +1,24 @@
 package io.github.novig4j.http;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
 import java.util.Objects;
 
-public record NovigCredentials(String client_id, String client_secret) {
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public record NovigCredentials(String clientId, String clientSecret) {
 
     public NovigCredentials {
-        if (client_id == null || client_id.equals("")) {
-            throw new IllegalStateException("Client Id cannot be null or empty");
-        }
+        Objects.requireNonNull(clientId, "clientId");
+        Objects.requireNonNull(clientSecret,"clientSecret");
 
-        if (client_secret == null || client_secret.equals("")) {
-            throw new IllegalStateException("Client Secret Cannot be null");
-        }
+        if (clientId.isBlank()) throw new IllegalStateException("Client id must not be blank");
+        if (clientSecret.isBlank()) throw new IllegalStateException("Client Secret must not be blank");
     }
-
 
     @Override
     public String toString() {
-        return "HIDING SECRETS";
+        return "Credentials[clientId=***"  + ", clientSecret=***]";
     }
 
 
@@ -25,11 +26,11 @@ public record NovigCredentials(String client_id, String client_secret) {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         NovigCredentials that = (NovigCredentials) o;
-        return Objects.equals(client_id, that.client_id);
+        return Objects.equals(clientId, that.clientId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(client_id);
+        return Objects.hash(clientId);
     }
 }

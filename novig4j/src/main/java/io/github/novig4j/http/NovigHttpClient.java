@@ -17,34 +17,41 @@ public class NovigHttpClient implements AutoCloseable {
     private NovigHttpClient(Builder b) {
         environment = b.environment;
         credentials = b.credentials;
-        this.client = HttpClient.newBuilder().build();
-        this.tokenManager = new TokenManager(credentials, environment, client);
-        this.mapper = JacksonConfig.create();
+        this.client = b.client;
+        this.mapper = b.mapper;
+        this.tokenManager = new TokenManager(credentials, environment, client, mapper);
     }
 
-    // in-case user want to pass their own client in
-    private NovigHttpClient(Builder b, HttpClient client) {
-        environment = b.environment;
-        credentials = b.credentials;
-        this.client = client;
-        this.tokenManager = new TokenManager(credentials, environment, client);
-        this.mapper = JacksonConfig.create();
-    }
 
 
     @Override
-    public void close() throws InterruptedException {
+    public void close()  {
         client.close();
     }
 
     public String clientId() {
-        return credentials.client_id();
+        return credentials.clientId();
     }
     public NovigEnvironment getEnvironment() {return environment;}
+    public HttpClient client() {return client;}
+    public ObjectMapper getMapper(){return mapper;}
+
+
+
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+
+
+
 
     public static final class Builder {
         private NovigCredentials credentials;
         private NovigEnvironment environment;
+        private HttpClient client = HttpClient.newBuilder().build();
+        private ObjectMapper mapper = JacksonConfig.create();
 
         public Builder() {
 
@@ -61,18 +68,22 @@ public class NovigHttpClient implements AutoCloseable {
             return this;
         }
 
+        public Builder client(HttpClient client){
+            this.client = client;
+            return this;
+        }
+
+        public Builder mapper(ObjectMapper mapper){
+            this.mapper = mapper;
+            return this;
+        }
+
 
 
         public NovigHttpClient build() {
 
-            if (credentials == null) {
-                throw new IllegalStateException("Please Provide Credentials");
-            }
-
-
-            if (environment == null) {
-                throw new IllegalStateException("Please Provide environment");
-            }
+            Objects.requireNonNull(environment, "Environment is required");
+            Objects.requireNonNull(credentials, "Credentials are required");
 
             return new NovigHttpClient(this);
         }
