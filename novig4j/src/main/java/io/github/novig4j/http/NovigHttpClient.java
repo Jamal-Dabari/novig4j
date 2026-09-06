@@ -2,12 +2,9 @@ package io.github.novig4j.http;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.novig4j.JacksonConfig;
 
 import java.net.http.HttpClient;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 public class NovigHttpClient implements AutoCloseable {
     private final HttpClient client;
