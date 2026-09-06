@@ -1,5 +1,7 @@
 package io.github.novig4j.model.markets;
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
+
 public enum Status {
-    INITIAL, OPEN_PREGAME, CLOSED_PREGAME, OPEN_INGAME, FINAL, DELAYED, CANCELLED;
+    CANCELLED, CLOSED_PREGAME, DELAYED, FINAL, INITIAL, OPEN_INGAME, OPEN_PREGAME, @JsonEnumDefaultValue UNKNOWN;
 }

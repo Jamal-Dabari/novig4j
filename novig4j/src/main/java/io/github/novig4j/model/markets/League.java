@@ -1,5 +1,7 @@
 package io.github.novig4j.model.markets;
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
+
 public enum League {
     NFL, NBA, MLB,
     NHL, NCAAF, NCAAB,
@@ -7,5 +9,5 @@ public enum League {
     MLS, FIFACLUBWORLDCUP,
     EPL, BUNDESLIGA, SERIEA,
     LALIGA, LIGUE1, CHAMPIONSLEAGUE,
-    EUROPALEAGUE, WTA, ATP, PGA, ENTERTAINMENT;
+    EUROPALEAGUE, WTA, ATP, PGA, ENTERTAINMENT, @JsonEnumDefaultValue UNKNOWN;
 }
