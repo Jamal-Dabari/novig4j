@@ -3,7 +3,7 @@ package io.github.novig4j.http;
 import java.util.HashMap;
 import java.util.Map;
 
-public record Request(HttpMethod method, String path, Map<String, String> headers, Map<String, String> queryParams,
+public record Request(HttpMethod method, String path,NovigEnvironment environment,  Map<String, String> headers, Map<String, String> queryParams,
                       String body) {
 
     public Request {
@@ -13,6 +13,10 @@ public record Request(HttpMethod method, String path, Map<String, String> header
 
         if (path == null) {
             throw new IllegalStateException("Request needs a path");
+        }
+
+        if (environment == null) {
+            throw new IllegalStateException("Request needs a specified environment");
         }
 
         headers = Map.copyOf(headers);
@@ -27,6 +31,7 @@ public record Request(HttpMethod method, String path, Map<String, String> header
     public final static class Builder {
         private HttpMethod method;
         private String path;
+        private NovigEnvironment environment;
         private final Map<String, String> headers = new HashMap<>();
         private final Map<String, String> queryParams = new HashMap<>();
         private String body;
@@ -36,8 +41,13 @@ public record Request(HttpMethod method, String path, Map<String, String> header
             return this;
         }
 
-        public Builder path(String uri) {
-            this.path = uri;
+        public Builder path(String path) {
+            this.path = path;
+            return this;
+        }
+
+        public Builder environment(NovigEnvironment environment) {
+            this.environment = environment;
             return this;
         }
 
@@ -60,11 +70,11 @@ public record Request(HttpMethod method, String path, Map<String, String> header
             if (method == null) {
                 throw new IllegalStateException("Request needs Method");
             }
-            if (path == null) {
+            if (environment == null) {
                 throw new IllegalStateException("Request needs a Path");
             }
 
-            return new Request(method, path, headers, queryParams, body);
+            return new Request(method, path, environment, headers, queryParams, body);
         }
 
 

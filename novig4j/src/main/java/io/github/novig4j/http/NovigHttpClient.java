@@ -3,7 +3,11 @@ package io.github.novig4j.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.List;
 import java.util.Objects;
 
 public class NovigHttpClient implements AutoCloseable {
@@ -35,6 +39,10 @@ public class NovigHttpClient implements AutoCloseable {
     public NovigEnvironment getEnvironment() {return environment;}
     public HttpClient client() {return client;}
     public ObjectMapper getMapper(){return mapper;}
+
+    public void sendRequest(Request r) throws IOException, InterruptedException {
+        client.send(RequestFactory.toHttpRequest(r), HttpResponse.BodyHandlers.ofString());
+    }
 
 
 
