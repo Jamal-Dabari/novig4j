@@ -2,7 +2,9 @@ package io.github.novig4j.http;
 
 import org.junit.jupiter.api.Test;
 
+import java.net.URI;
 import java.net.http.HttpRequest;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -76,12 +78,16 @@ class RequestTests {
     }
 
     @Test
-    void toHttpRequestAssemblesUriWithMultipleQueryParamsEncodes(){
+    void toHttpRequestAssemblesUriWithMultipleQueryParams(){
         // todo remove null token manager once auth is done
         RequestFactory factory = new RequestFactory(NovigEnvironment.QA, null);
         Request request = Request.builder().method(HttpMethod.GET).path("markets").queryParams("a", "b").queryParams("c", "d").build();
-        HttpRequest httpRequest = factory.toHttpRequest(request);
-        assertEquals("https://api-qa.novig.us/nbx/v2/markets?a=b&c=d", httpRequest.uri().toString());
+        URI uri = factory.toHttpRequest(request).uri();
+
+        // Map.copyOf iteration order is randomised per JVM run, so assert the
+        // pairs rather than a fixed ordering of the query string.
+        assertEquals("https://api-qa.novig.us/nbx/v2/markets", uri.toString().split("\\?")[0]);
+        assertEquals(Set.of("a=b", "c=d"), Set.of(uri.getQuery().split("&")));
     }
 
 
