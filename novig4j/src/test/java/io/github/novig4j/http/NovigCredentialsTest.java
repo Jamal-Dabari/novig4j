@@ -26,7 +26,7 @@ class NovigCredentialsTest {
     @Test
     void testHttpClientBuilderWithoutClientId(){
 
-        assertThrows(IllegalStateException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> {
                     NovigCredentials credentials = new NovigCredentials("", "TEST");
                     NovigHttpClient client = new NovigHttpClient.Builder().credentials(credentials).environment(NovigEnvironment.QA).build();
@@ -36,7 +36,7 @@ class NovigCredentialsTest {
     @Test
     void testHttpClientBuilderWithoutSecret(){
 
-        assertThrows(IllegalStateException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> {
                     NovigCredentials credentials = new NovigCredentials("asdf", "");
                     NovigHttpClient client = new NovigHttpClient.Builder().credentials(credentials).environment(NovigEnvironment.QA).build();

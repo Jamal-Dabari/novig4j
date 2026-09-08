@@ -12,8 +12,8 @@ public record NovigCredentials(String clientId, String clientSecret) {
         Objects.requireNonNull(clientId, "clientId");
         Objects.requireNonNull(clientSecret,"clientSecret");
 
-        if (clientId.isBlank()) throw new IllegalStateException("Client id must not be blank");
-        if (clientSecret.isBlank()) throw new IllegalStateException("Client Secret must not be blank");
+        if (clientId.isBlank()) throw new IllegalArgumentException("Client id must not be blank");
+        if (clientSecret.isBlank()) throw new IllegalArgumentException("Client Secret must not be blank");
     }
 
     @Override

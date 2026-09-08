@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
-import java.util.Objects;
 import java.net.http.HttpResponse;
 
 public class NovigHttpClient implements AutoCloseable {
@@ -91,8 +90,13 @@ public class NovigHttpClient implements AutoCloseable {
         public NovigHttpClient build() {
 
 
-            Objects.requireNonNull(environment, "Environment is required");
-            Objects.requireNonNull(credentials, "Credentials are required");
+            if (environment == null){
+                throw new IllegalArgumentException("Environment is required");
+            }
+
+            if (credentials == null){
+                throw new IllegalArgumentException("credentials are required");
+            }
 
             return new NovigHttpClient(this);
         }

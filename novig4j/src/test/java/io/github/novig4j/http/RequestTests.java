@@ -44,7 +44,7 @@ class RequestTests {
 
     @Test
     void testFailedRequestBuild(){
-        assertThrowsExactly(IllegalStateException.class, () -> Request.builder().build());
+        assertThrowsExactly(IllegalArgumentException.class, () -> Request.builder().build());
     }
 
 

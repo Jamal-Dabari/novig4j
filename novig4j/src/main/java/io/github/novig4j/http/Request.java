@@ -8,12 +8,13 @@ public record Request(HttpMethod method, String path,  Map<String, String> heade
 
     public Request {
         if (method == null) {
-            throw new IllegalStateException("Request needs a method");
+            throw new IllegalArgumentException("Request needs a method");
         }
 
         if (path == null) {
-            throw new IllegalStateException("Request needs a path");
+            throw new IllegalArgumentException("Request needs a path");
         }
+
 
         headers = Map.copyOf(headers);
         queryParams = Map.copyOf(queryParams);
@@ -41,12 +42,20 @@ public record Request(HttpMethod method, String path,  Map<String, String> heade
             return this;
         }
 
+
+
         public Builder headers(String name, String value) {
+            if (name == null || value == null){
+                throw new IllegalArgumentException("query cannot be null");
+            }
             headers.put(name, value);
             return this;
         }
 
         public Builder queryParams(String name, String value) {
+            if (name == null || value == null){
+                throw new IllegalArgumentException("query cannot be null");
+            }
             queryParams.put(name, value);
             return this;
         }
@@ -57,13 +66,7 @@ public record Request(HttpMethod method, String path,  Map<String, String> heade
         }
 
         public Request build() {
-            if (method == null) {
-                throw new IllegalStateException("Request needs Method");
-            }
 
-            if (path == null || path.isEmpty()){
-                throw new IllegalStateException("Request needs a path");
-            }
             return new Request(method, path, headers, queryParams, body);
         }
 
