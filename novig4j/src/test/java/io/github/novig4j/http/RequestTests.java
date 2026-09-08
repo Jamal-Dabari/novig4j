@@ -9,7 +9,7 @@ class RequestTests {
 
     @Test
     void testGetRequestBuilder() {
-        Request request = Request.builder().method(HttpMethod.GET).path("TESTING").environment(NovigEnvironment.QA).queryParams("Test", "Test").headers("Testing", "Testing").build();
+        Request request = Request.builder().method(HttpMethod.GET).path("TESTING").queryParams("Test", "Test").headers("Testing", "Testing").build();
 
         assertAll("Request properties",
                 () -> assertEquals(HttpMethod.GET, request.method()),
@@ -18,7 +18,7 @@ class RequestTests {
 
     @Test
     void testPostRequestBuilder(){
-        Request request = Request.builder().method(HttpMethod.POST).path("Testing").environment(NovigEnvironment.QA).body("THIS IS A TEST BODY").build();
+        Request request = Request.builder().method(HttpMethod.POST).path("Testing").body("THIS IS A TEST BODY").build();
 
         assertAll("POST request properties", () -> assertEquals(HttpMethod.POST, request.method()),
                 () -> assertEquals("Testing", request.path()), () -> assertEquals("THIS IS A TEST BODY", request.body()));
@@ -26,19 +26,19 @@ class RequestTests {
 
     @Test
     void testRequestHeaders(){
-        Request request = Request.builder().method(HttpMethod.GET).path(path).environment(NovigEnvironment.QA).headers("accept", "application/json").build();
+        Request request = Request.builder().method(HttpMethod.GET).path(path).headers("accept", "application/json").build();
         assertEquals("application/json", request.headers().get("accept"));
     }
 
     @Test
     void testRequestQueryParams(){
-        Request request = Request.builder().method(HttpMethod.GET).path(path).environment(NovigEnvironment.QA).queryParams("Dogs", "limit=500").build();
+        Request request = Request.builder().method(HttpMethod.GET).path(path).queryParams("Dogs", "limit=500").build();
         assertEquals("limit=500", request.queryParams().get("Dogs"));
     }
 
     @Test
     void testRequestBody(){
-        Request request = Request.builder().method(HttpMethod.POST).environment(NovigEnvironment.QA).path(path).body("THIS IS TEST").build();
+        Request request = Request.builder().method(HttpMethod.POST).path(path).body("THIS IS TEST").build();
         assertEquals("THIS IS TEST", request.body());
     }
 

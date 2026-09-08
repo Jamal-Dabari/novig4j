@@ -5,10 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.List;
 import java.util.Objects;
+import java.net.http.HttpResponse;
 
 public class NovigHttpClient implements AutoCloseable {
     private final HttpClient client;
@@ -16,6 +14,7 @@ public class NovigHttpClient implements AutoCloseable {
     private final NovigCredentials credentials;
     private final TokenManager tokenManager;
     private final ObjectMapper mapper;
+    private final RequestFactory requests;
 
 
     private NovigHttpClient(Builder b) {
@@ -24,6 +23,7 @@ public class NovigHttpClient implements AutoCloseable {
         this.client = b.client;
         this.mapper = b.mapper;
         this.tokenManager = new TokenManager(credentials, environment, client, mapper);
+        this.requests = new RequestFactory(environment, tokenManager);
     }
 
 
@@ -41,7 +41,7 @@ public class NovigHttpClient implements AutoCloseable {
     public ObjectMapper getMapper(){return mapper;}
 
     public void sendRequest(Request r) throws IOException, InterruptedException {
-        client.send(RequestFactory.toHttpRequest(r), HttpResponse.BodyHandlers.ofString());
+        client.send(requests.toHttpRequest(r), HttpResponse.BodyHandlers.ofString());
     }
 
 
@@ -89,6 +89,7 @@ public class NovigHttpClient implements AutoCloseable {
 
 
         public NovigHttpClient build() {
+
 
             Objects.requireNonNull(environment, "Environment is required");
             Objects.requireNonNull(credentials, "Credentials are required");
