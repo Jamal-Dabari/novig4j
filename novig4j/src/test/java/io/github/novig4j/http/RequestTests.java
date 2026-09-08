@@ -1,8 +1,5 @@
-package netTests;
+package io.github.novig4j.http;
 
-import io.github.novig4j.http.HttpMethod;
-import io.github.novig4j.http.NovigEnvironment;
-import io.github.novig4j.http.Request;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

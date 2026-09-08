@@ -1,8 +1,4 @@
-package netTests;
-import io.github.novig4j.http.HttpMethod;
-import io.github.novig4j.http.NovigCredentials;
-import io.github.novig4j.http.NovigEnvironment;
-import io.github.novig4j.http.NovigHttpClient;
+package io.github.novig4j.http;
 import org.junit.jupiter.api.Test;
 
 import java.net.http.HttpClient;
