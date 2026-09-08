@@ -8,39 +8,22 @@ class NovigCredentialsTest {
 
 
     @Test
-    void testHttpClientBuilder(){
+    void testCredentialsDoesntLeak(){
+        NovigCredentials credentials = new NovigCredentials("test", "testSecret");
+        assertEquals("Credentials[clientId=***" + ", clientSecret=***]", credentials.toString());
+    }
 
-        NovigCredentials credentials = new NovigCredentials("TEST", "BEST");
-
-        NovigHttpClient client = new NovigHttpClient.Builder()
-                .credentials(credentials)
-                .environment(NovigEnvironment.QA)
-                .build();
+    @Test
+    void testCredentialsThrowsWhenNullOrEmpty(){
 
         assertAll(
-    //            () -> assertEquals("TEST", client.getCredentials().client_id()),
-                () -> assertEquals(NovigEnvironment.QA, client.getEnvironment())
+                () -> assertThrows(IllegalArgumentException.class, () -> new NovigCredentials("", "")),
+                () -> assertThrows(NullPointerException.class, () -> new NovigCredentials(null ,null))
         );
+
     }
 
-    @Test
-    void testHttpClientBuilderWithoutClientId(){
 
-        assertThrows(IllegalArgumentException.class,
-                () -> {
-                    NovigCredentials credentials = new NovigCredentials("", "TEST");
-                    NovigHttpClient client = new NovigHttpClient.Builder().credentials(credentials).environment(NovigEnvironment.QA).build();
-            }, "Client id must not be null");
-    }
 
-    @Test
-    void testHttpClientBuilderWithoutSecret(){
-
-        assertThrows(IllegalArgumentException.class,
-                () -> {
-                    NovigCredentials credentials = new NovigCredentials("asdf", "");
-                    NovigHttpClient client = new NovigHttpClient.Builder().credentials(credentials).environment(NovigEnvironment.QA).build();
-            }, "Client Secret must not be null");
-    }
 
 }
