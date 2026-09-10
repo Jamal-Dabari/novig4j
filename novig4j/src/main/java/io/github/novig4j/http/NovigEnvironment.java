@@ -1,30 +1,22 @@
 package io.github.novig4j.http;
 
-public enum NovigEnvironment {
-    PRODUCTION("https://api.novig.us/nbx/v2/", "https://api.novig.us/nbx/v1/auth/emm-token", "wss://api.novig.us/tape"),
-    QA("https://api-qa.novig.us/nbx/v2/", "https://api-qa.novig.us/nbx/v1/auth/emm-token", "wss://api-qa.novig.us/tape");
+import java.net.URI;
+import java.util.Objects;
 
-    private final String restUrl;
-    private final String authUrl;
-    private final String wsUrl;
+public record NovigEnvironment(URI restUrl, URI authUrl, URI wsUrl) {
 
+    public static final NovigEnvironment PRODUCTION = new NovigEnvironment(URI.create("https://api.novig.us/nbx/v2/"),URI.create("https://api.novig.us/nbx/v1/auth/emm-token"), URI.create("wss://api.novig.us/tape"));
+    public static final NovigEnvironment QA = new NovigEnvironment(URI.create("https://api.novig.us/nbx/v2/"), URI.create("https://api-qa.novig.us/nbx/v1/auth/emm-token/"), URI.create("wss://api-qa.novig.us/tape"));
 
-    NovigEnvironment(String restUrl, String authUrl, String wsUrl) {
-        this.restUrl = restUrl;
-        this.authUrl = authUrl;
-        this.wsUrl = wsUrl;
+    public NovigEnvironment{
+        Objects.requireNonNull(restUrl);
+        Objects.requireNonNull(authUrl);
 
+        if (!restUrl.isAbsolute() || !authUrl.isAbsolute()){
+            throw new IllegalArgumentException("endpoints must be absolute");
+        }
     }
 
-    public String getRestUrl() {
-        return restUrl;
-    }
-
-    public String getAuthUrl() {
-        return authUrl;
-    }
-
-    public String getWsUrl() {
-        return wsUrl;
-    }
 }
+
+

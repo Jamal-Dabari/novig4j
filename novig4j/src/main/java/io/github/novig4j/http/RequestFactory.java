@@ -20,7 +20,7 @@ final class RequestFactory {
 
     HttpRequest toHttpRequest(Request r){
 
-        String url = this.environment.getRestUrl() + r.path();
+        String url = this.environment.restUrl() + r.path();
 
         if(r.queryParams() != null && !r.queryParams().isEmpty()) {
             final String queryString = r.queryParams().entrySet().stream()
@@ -42,8 +42,7 @@ final class RequestFactory {
             r.headers().forEach((key, val) -> {
                 if (key != null && val != null){
                     if (key.equals("Authorization")){
-
-                        // todo: Attach the token here
+                        // todo: Attach the token her
                     }
 
                     builder.headers(key, val);
