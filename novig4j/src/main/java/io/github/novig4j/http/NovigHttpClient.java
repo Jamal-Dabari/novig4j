@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.time.Clock;
 
 public class NovigHttpClient implements AutoCloseable {
     private final HttpClient client;
@@ -14,6 +15,7 @@ public class NovigHttpClient implements AutoCloseable {
     private final TokenManager tokenManager;
     private final ObjectMapper mapper;
     private final RequestFactory requests;
+    private final Clock timer;
 
 
     private NovigHttpClient(Builder b) {
@@ -21,7 +23,8 @@ public class NovigHttpClient implements AutoCloseable {
         credentials = b.credentials;
         this.client = b.client;
         this.mapper = b.mapper;
-        this.tokenManager = new TokenManager(credentials, environment, client, mapper);
+        this.timer = Clock.systemUTC();
+        this.tokenManager = new TokenManager(credentials, environment, this, mapper,timer);
         this.requests = new RequestFactory(environment, tokenManager);
     }
 
@@ -42,6 +45,12 @@ public class NovigHttpClient implements AutoCloseable {
     public void sendRequest(Request r) throws IOException, InterruptedException {
         client.send(requests.toHttpRequest(r), HttpResponse.BodyHandlers.ofString());
     }
+    public Response sendAsyncRequest(Request r) throws IOException, InterruptedException {
+        client.sendAsync(requests.toHttpRequest(r), HttpResponse.BodyHandlers.ofString());
+        return null;
+    }
+
+
 
 
 
