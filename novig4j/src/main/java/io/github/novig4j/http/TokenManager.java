@@ -4,73 +4,84 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
 import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 class TokenManager {
     private final NovigCredentials credentials;
     private final NovigEnvironment environment;
-    private final NovigHttpClient client;
+    private final HttpClient client;
     private final ObjectMapper mapper;
     private volatile AccessToken token;
     private final Clock timer;
+    private final ReentrantLock lock;
 
-    public TokenManager(NovigCredentials credentials, NovigEnvironment environment, NovigHttpClient client, ObjectMapper mapper, Clock timer){
+    public TokenManager(NovigCredentials credentials, NovigEnvironment environment,  ObjectMapper mapper, Clock timer){
         this.credentials = credentials;
         this.environment = environment;
-        this.client = client;
+        this.client = HttpClient.newHttpClient();
         this.mapper = mapper;
         this.timer = timer;
+        this.lock = new ReentrantLock();
     }
 
-    AccessToken get() throws IOException, InterruptedException {
+    public AccessToken get() throws IOException, InterruptedException {
+        AccessToken t = token;
+        Duration refresh = Duration.of(60, ChronoUnit.SECONDS);
 
-        if (token == null) {
-            Request r = Request.builder().method(HttpMethod.POST).headers("Content-Type: ", "application/json").body(
-                    "grant_type: client_credentials, client_id: " + credentials.clientId() + ", client_secret: " + credentials.clientSecret()
-
-            ).build();
-
-            Response response = client.sendAsyncRequest(r);
-            if (response.statusCode() == 401){
-                invalidate(this.token);
-            }
-
-
-            buildToken(response);
-
-            if (!isValid(timer.instant(), Duration.of(30, ChronoUnit.MINUTES))){
-                // reissue the token;
-                Response newToken = client.sendAsyncRequest(r);
-                buildToken(response);
-            }
-
-
+        if (token != null && token.isValid(timer.instant(), refresh)){
+            return token;
         }
 
-        return token;
+        lock.lock();
+
+        try {
+            t = token;
+
+            if (token != null && token.isValid(Clock.systemUTC().instant(), refresh)){
+                return token;
+            }
+
+            this.token = fetch();
+
+            return token;
+        } finally {
+
+            lock.unlock();
+
+        }
     }
 
-    void buildToken(Response response) throws IOException {
-        token = mapper.readValue(response.body(), AccessToken.class);
+    private AccessToken buildToken(Response response) throws IOException {
+        AccessToken builtToken = mapper.readValue(response.body(), AccessToken.class);
+        return builtToken;
     }
 
 
-    boolean isValid(Instant now, Duration margin){
-        Instant expiresAt = token.expiresAt();
-        return now.plus(margin).isBefore(expiresAt);
 
-    }
 
-    void invalidate(AccessToken token){
+    private void invalidate(){
         this.token = null;
     }
 
-    public AccessToken fetch(){
-        return token;
+    private AccessToken fetch() throws IOException, InterruptedException {
+        AccessToken cachedToken;
+
+        Request r = Request.builder()
+                .method(HttpMethod.POST)
+                .path("").
+                headers("Content-Type: ", "application/json")
+                .body(mapper.writeValueAsString(credentials))
+                .build();
+
+        // Response response = client.sendAsyncRequest(r);
+
+    //    cachedToken = buildToken(response);
+
+     //   return cachedToken;
+        return null;
     }
 
 }
