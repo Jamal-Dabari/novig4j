@@ -11,10 +11,9 @@ public record Request(HttpMethod method, String path,  Map<String, String> heade
             throw new IllegalArgumentException("Request needs a method");
         }
 
-        if (path == null) {
+        if (path == null || path.isEmpty()) {
             throw new IllegalArgumentException("Request needs a path");
         }
-
 
         headers = Map.copyOf(headers);
         queryParams = Map.copyOf(queryParams);
