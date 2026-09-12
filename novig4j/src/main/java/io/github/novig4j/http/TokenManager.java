@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -29,9 +31,8 @@ class TokenManager {
 
     public AccessToken get() throws IOException, InterruptedException {
         AccessToken t = token;
-        Duration refresh = Duration.of(60, ChronoUnit.SECONDS);
 
-        if (token != null && token.isValid(timer.instant(), refresh)){
+        if (token != null && token.isValid(timer)){
             return token;
         }
 
@@ -40,7 +41,7 @@ class TokenManager {
         try {
             t = token;
 
-            if (token != null && token.isValid(Clock.systemUTC().instant(), refresh)){
+            if (token != null && token.isValid(timer)){
                 return token;
             }
 
@@ -54,8 +55,10 @@ class TokenManager {
         }
     }
 
-    private AccessToken buildToken(Response response) throws IOException {
-        AccessToken builtToken = mapper.readValue(response.body(), AccessToken.class);
+    private AccessToken buildToken(HttpResponse<String> response) throws IOException {
+        AccessTokenResponse read = mapper.readValue(response.body(), AccessTokenResponse.class);
+        AccessToken builtToken = AccessToken.from(read, timer);
+
         return builtToken;
     }
 
@@ -69,19 +72,20 @@ class TokenManager {
     private AccessToken fetch() throws IOException, InterruptedException {
         AccessToken cachedToken;
 
-        Request r = Request.builder()
-                .method(HttpMethod.POST)
-                .path("").
-                headers("Content-Type: ", "application/json")
-                .body(mapper.writeValueAsString(credentials))
+        HttpRequest request = HttpRequest.newBuilder(environment.authUrl())
+                .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(credentials)))
+                .header("Content-Type", "application/json")
                 .build();
 
-        // Response response = client.sendAsyncRequest(r);
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-    //    cachedToken = buildToken(response);
+        if (response.statusCode() < 300 ){
+            cachedToken = buildToken(response);
+            return cachedToken;
+        } else {
+            throw new IOException("Token error with response code: " + response.statusCode());
+        }
 
-     //   return cachedToken;
-        return null;
     }
 
 }
