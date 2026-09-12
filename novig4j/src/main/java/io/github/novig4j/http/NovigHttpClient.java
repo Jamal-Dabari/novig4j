@@ -27,7 +27,7 @@ public class NovigHttpClient implements AutoCloseable {
         this.mapper = b.mapper;
         this.timer = Clock.systemUTC();
         this.tokenManager = new TokenManager(credentials, environment, mapper, timer);
-        this.requests = new RequestFactory(environment, tokenManager);
+        this.requests = new RequestFactory(environment.restUrl());
     }
 
 
@@ -36,7 +36,6 @@ public class NovigHttpClient implements AutoCloseable {
     public void close()  {
         client.close();
     }
-
     public String clientId() {
         return credentials.clientId();
     }
@@ -44,13 +43,14 @@ public class NovigHttpClient implements AutoCloseable {
     public HttpClient client() {return client;}
     public ObjectMapper getMapper(){return mapper;}
 
+
     public Response sendRequest(Request r) throws IOException, InterruptedException {
-        client.send(requests.toHttpRequest(r), HttpResponse.BodyHandlers.ofString());
+        client.send(requests.toHttpRequest(r, tokenManager.get().value()), HttpResponse.BodyHandlers.ofString());
         return null;
     }
 
     public Response sendAsyncRequest(Request r) throws IOException, InterruptedException {
-        return client.sendAsync(requests.toHttpRequest(r), HttpResponse.BodyHandlers.ofString())
+        return client.sendAsync(requests.toHttpRequest(r, tokenManager.get().value()), HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .thenApply(body -> {
                     try {
@@ -62,17 +62,9 @@ public class NovigHttpClient implements AutoCloseable {
     }
 
 
-
-
-
-
     public static Builder builder() {
         return new Builder();
     }
-
-
-
-
 
     public static final class Builder {
         private NovigCredentials credentials;

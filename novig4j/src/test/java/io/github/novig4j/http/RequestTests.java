@@ -59,10 +59,9 @@ class RequestTests {
 
     @Test
     void toHttpRequestAssemblesUriAndEncodesSpaces(){
-        // todo remove null token manager once auth is done
-        RequestFactory factory = new RequestFactory(NovigEnvironment.QA, null);
+        RequestFactory factory = new RequestFactory(NovigEnvironment.QA.restUrl());
         Request request = Request.builder().method(HttpMethod.GET).path("markets").queryParams("q", "two words").build();
-        HttpRequest httpRequest = factory.toHttpRequest(request);
+        HttpRequest httpRequest = factory.toHttpRequest(request, null);
         assertEquals("https://api-qa.novig.us/nbx/v2/markets?q=two%20words", httpRequest.uri().toString());
     }
 
@@ -70,19 +69,17 @@ class RequestTests {
 
     @Test
     void toHttpRequestAssemblesUriAndEncodesCommas(){
-        // todo remove null token manager once auth is done
-        RequestFactory factory = new RequestFactory(NovigEnvironment.QA, null);
+        RequestFactory factory = new RequestFactory(NovigEnvironment.QA.restUrl());
         Request request = Request.builder().method(HttpMethod.GET).path("markets").queryParams("outcomeIds", "1,2,3,4,5").build();
-        HttpRequest httpRequest = factory.toHttpRequest(request);
+        HttpRequest httpRequest = factory.toHttpRequest(request, null);
         assertEquals("https://api-qa.novig.us/nbx/v2/markets?outcomeIds=1,2,3,4,5", httpRequest.uri().toString());
     }
 
     @Test
     void toHttpRequestAssemblesUriWithMultipleQueryParams(){
-        // todo remove null token manager once auth is done
-        RequestFactory factory = new RequestFactory(NovigEnvironment.QA, null);
+        RequestFactory factory = new RequestFactory(NovigEnvironment.QA.restUrl());
         Request request = Request.builder().method(HttpMethod.GET).path("markets").queryParams("a", "b").queryParams("c", "d").build();
-        URI uri = factory.toHttpRequest(request).uri();
+        URI uri = factory.toHttpRequest(request, null).uri();
 
         // Map.copyOf iteration order is randomised per JVM run, so assert the
         // pairs rather than a fixed ordering of the query string.

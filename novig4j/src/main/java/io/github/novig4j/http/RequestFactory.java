@@ -9,18 +9,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 
 final class RequestFactory {
-    private final NovigEnvironment environment;
-    private final TokenManager tokenManager;
+    private final URI base;
 
-    public RequestFactory(NovigEnvironment environment, TokenManager tokenManager) {
-        this.environment = environment;
-        this.tokenManager = tokenManager;
-
+    public RequestFactory(URI base) {
+        this.base = base;
     }
 
-    HttpRequest toHttpRequest(Request r){
+    HttpRequest toHttpRequest(Request r, String bearer){
 
-        String url = this.environment + r.path();
+        String url = base + r.path();
 
         if(r.queryParams() != null && !r.queryParams().isEmpty()) {
             final String queryString = r.queryParams().entrySet().stream()
@@ -40,14 +37,10 @@ final class RequestFactory {
 
         if (r.headers() != null){
             r.headers().forEach((key, val) -> {
-                if (key != null && val != null){
-                    if (key.equals("Authorization")){
-                        // todo: Attach the token here
-                    }
-
                     builder.headers(key, val);
-                }
             });
+
+            if (bearer != null) builder.header("Authorization", "Bearer " + bearer);
         }
 
         return switch (r.method()){
